@@ -23,8 +23,8 @@ export class DiscogsClientService {
         return data;
     }
 
-    async getPriceSuggestion(discogsId: String): Promise<string>{
+    async getPriceSuggestion(discogsId: String): Promise<PriceSuggestion>{
         const price_suggestions = await this.getPriceSuggestions(discogsId.valueOf());
-        return price_suggestions["Good (G)"].value.toString();
+        return price_suggestions;
     }
 }
