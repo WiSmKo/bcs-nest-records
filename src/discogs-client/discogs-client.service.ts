@@ -2,17 +2,23 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable, Req } from '@nestjs/common';
 import { AxiosError, AxiosResponse } from 'axios';
 import { Observable, catchError, firstValueFrom } from 'rxjs';
-import { PriceSuggestion }  from './price-suggestion/price-suggestion.interface';
 import { DiscogsResponse } from './discogs-response/discogs-response.interface';
 
 @Injectable()
 export class DiscogsClientService {
 
-    constructor(private readonly httpService: HttpService) {}
+    private baseUrl: string;
+    private databaseSearchEndpoint: string;
+    private discogsAuthToken: string;
 
-    async findRecords(title: string, artist: string, year: string, label: string): Promise<DiscogsResponse>{
+    constructor(private readonly httpService: HttpService) {
+        this.baseUrl = process.env.DISCOGS_BASE_URL;
+        this.databaseSearchEndpoint = '/database/search?';
+        this.discogsAuthToken = process.env.DISCOGS_TOKEN;
 
-        let database_search_url: string = '/database/search?';
+    }
+
+    async findRecords(title: string, artist: string, year: string, label: string): Promise<DiscogsResponse>{ 
 
         const queryParams = {
             type: "release",
@@ -23,27 +29,35 @@ export class DiscogsClientService {
             label: label
         }
 
+        let url: string = this.buildQuery(queryParams, this.databaseSearchEndpoint);
+
+        console.log(`Discogs Client Service: Searching for records with parameters: ${url}`);
+
+        const { data } = await firstValueFrom(
+            this.httpService.get<DiscogsResponse>(url, 
+                {headers: 
+                    {'Authorization' : 'Discogs token='+this.discogsAuthToken}}).pipe(
+                    catchError((error: AxiosError) => {
+                    console.log('An error occurred:', error);
+                    throw error;
+                }),
+            ),
+        )
+
+        return data;
+    }
+
+    private buildQuery(parameters: Record<string, any>, endpoint: string): string{
 
         const urlSearchParams = new URLSearchParams();
-        for(const [key, value] of Object.entries(queryParams)){
+        for(const [key, value] of Object.entries(parameters)){
             if (value !== undefined){
                 urlSearchParams.append(key, value);
             }
         }
 
-        console.log(`Discogs Client Service: Searching for records with parameters: ${urlSearchParams.toString()}`);
+        return `${this.baseUrl}${endpoint}?${urlSearchParams.toString()}`;
 
-        //DO We WANT THIS TO BE firstValueFrom?
-        const { data } = await firstValueFrom(
-            this.httpService.get<DiscogsResponse>(process.env.DISCOGS_BASE_URL+database_search_url.concat(urlSearchParams.toString()),
-            {headers: {'Authorization' : 'Discogs token='+process.env.DISCOGS_TOKEN}}).pipe(
-                catchError((error: AxiosError) => {
-                    console.log(error.response.data);
-                    throw 'An error happened.';
-                }),
-            ),
-        )
-        return data;
     }
 
 }
