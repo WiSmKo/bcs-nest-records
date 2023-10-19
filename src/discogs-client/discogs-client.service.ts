@@ -3,9 +3,12 @@ import { Injectable, Req } from '@nestjs/common';
 import { AxiosError, AxiosResponse } from 'axios';
 import { Observable, catchError, firstValueFrom } from 'rxjs';
 import { DiscogsResponse } from './discogs-response/discogs-response.interface';
+import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class DiscogsClientService {
+
+    private logger = new Logger('DiscogsClientService');
 
     private baseUrl: string;
     private databaseSearchEndpoint: string;
@@ -13,7 +16,7 @@ export class DiscogsClientService {
 
     constructor(private readonly httpService: HttpService) {
         this.baseUrl = process.env.DISCOGS_BASE_URL;
-        this.databaseSearchEndpoint = '/database/search?';
+        this.databaseSearchEndpoint = '/database/search';
         this.discogsAuthToken = process.env.DISCOGS_TOKEN;
 
     }
@@ -31,14 +34,14 @@ export class DiscogsClientService {
 
         let url: string = this.buildQuery(queryParams, this.databaseSearchEndpoint);
 
-        console.log(`Discogs Client Service: Searching for records with parameters: ${url}`);
+        this.logger.log(`Searching url: ${url}`);
 
         const { data } = await firstValueFrom(
             this.httpService.get<DiscogsResponse>(url, 
                 {headers: 
                     {'Authorization' : 'Discogs token='+this.discogsAuthToken}}).pipe(
                     catchError((error: AxiosError) => {
-                    console.log('An error occurred:', error);
+                    this.logger.error('An error occurred:', error);
                     throw error;
                 }),
             ),
