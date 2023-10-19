@@ -21,6 +21,15 @@ export class DiscogsClientService {
 
     }
 
+    /**
+     * Client method for searching the Discogs API, making use of the GET /database/search endpoint.
+     * 
+     * @param title name of the release
+     * @param artist name of the recording artist
+     * @param year relase year
+     * @param label name of the label the record was released on
+     * @returns 
+     */
     async findRecords(title: string, artist: string, year: string, label: string): Promise<DiscogsResponse>{ 
 
         const queryParams = {
@@ -41,7 +50,7 @@ export class DiscogsClientService {
                 {headers: 
                     {'Authorization' : 'Discogs token='+this.discogsAuthToken}}).pipe(
                     catchError((error: AxiosError) => {
-                    this.logger.error('An error occurred:', error);
+                    this.logger.error('An error occurred making request to Discogs API:', error);
                     throw error;
                 }),
             ),
@@ -50,6 +59,15 @@ export class DiscogsClientService {
         return data;
     }
 
+    /**
+     * 
+     * This helper method is used to build the url for the search, taking search parameters and the endpoint as 
+     * parameters and using the base url declared in the classes constructor to build the url.
+     * 
+     * @param parameters is the query parameters of the request
+     * @param endpoint the end point we want to reach
+     * @returns string of the url  
+     */
     private buildQuery(parameters: Record<string, any>, endpoint: string): string{
 
         const urlSearchParams = new URLSearchParams();
