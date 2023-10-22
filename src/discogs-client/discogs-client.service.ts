@@ -2,8 +2,9 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable, Req } from '@nestjs/common';
 import { AxiosError, AxiosResponse } from 'axios';
 import { Observable, catchError, firstValueFrom } from 'rxjs';
-import { DiscogsResponse } from './discogs-response/discogs-response.interface';
+import { DiscogsResponse } from './transfer-objects/responses/discogs-response/discogs-response.interface';
 import { Logger } from '@nestjs/common';
+import { FindRecordsDto } from 'src/bcs-records-api/requests/find-records-request-dto'
 
 @Injectable()
 export class DiscogsClientService {
@@ -30,15 +31,15 @@ export class DiscogsClientService {
      * @param label name of the label the record was released on
      * @returns 
      */
-    async findRecords(title: string, artist: string, year: string, label: string): Promise<DiscogsResponse>{ 
+    async findRecords(findRecordsDto: FindRecordsDto): Promise<DiscogsResponse>{ 
 
         const queryParams = {
             type: "release",
             format: "vinyl",
-            title: title,
-            artist: artist,
-            year: year,
-            label: label
+            title: findRecordsDto.title,
+            artist: findRecordsDto.artist,
+            year: findRecordsDto.year,
+            label: findRecordsDto.label
         }
 
         let url: string = this.buildQuery(queryParams, this.databaseSearchEndpoint);
