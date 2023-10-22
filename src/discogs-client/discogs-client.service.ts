@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, Req } from '@nestjs/common';
-import { AxiosError, AxiosResponse } from 'axios';
-import { Observable, catchError, firstValueFrom } from 'rxjs';
+import { Injectable } from '@nestjs/common';
+import { AxiosError } from 'axios';
+import { catchError, firstValueFrom } from 'rxjs';
 import { DiscogsResponse } from './transfer-objects/responses/discogs-response/discogs-response.interface';
 import { Logger } from '@nestjs/common';
 import { FindRecordsDto } from 'src/bcs-records-api/requests/find-records-request-dto'
