@@ -46,6 +46,7 @@ export class DiscogsClientService {
 
         this.logger.log(`Searching url: ${url}`);
 
+        //Given that it seems nest.js wraps axios calls in observables for Nest's reactive approach, we use rxjs to convert  response to a promise.
         const { data } = await firstValueFrom(
             this.httpService.get<DiscogsResponse>(url, 
                 {headers: 
