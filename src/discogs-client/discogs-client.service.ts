@@ -39,7 +39,8 @@ export class DiscogsClientService {
             title: findRecordsDto.title,
             artist: findRecordsDto.artist,
             year: findRecordsDto.year,
-            label: findRecordsDto.label
+            label: findRecordsDto.label,
+            country: findRecordsDto.country
         }
 
         let url: string = this.buildQuery(queryParams, this.databaseSearchEndpoint);

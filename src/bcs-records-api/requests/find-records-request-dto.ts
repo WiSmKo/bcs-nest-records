@@ -18,4 +18,8 @@ export class FindRecordsDto {
     @IsString()
     @IsOptional()
     label: string;
+
+    @IsString()
+    @IsOptional()
+    country: string;
 }
