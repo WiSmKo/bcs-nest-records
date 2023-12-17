@@ -5,6 +5,7 @@ import { catchError, firstValueFrom } from 'rxjs';
 import { DiscogsResponse } from './transfer-objects/responses/discogs-response/discogs-response.interface';
 import { Logger } from '@nestjs/common';
 import { FindRecordsDto } from 'src/bcs-records-api/requests/find-records-request-dto'
+import { PriceSuggestion }  from './transfer-objects/responses/price-suggestion/price-suggestion.interface';
 
 @Injectable()
 export class DiscogsClientService {
@@ -60,6 +61,21 @@ export class DiscogsClientService {
         )
 
         return data;
+    }
+
+    async getPriceSuggestions(discogsId: String): Promise<number>{
+        console.log(`Discogs Client Service: Getting price suggestions for discogs id [${discogsId}]`)
+        const { data } = await firstValueFrom(
+            this.httpService.get<PriceSuggestion>('https://api.discogs.com/marketplace/price_suggestions/'+discogsId, 
+            {headers: {'Authorization' : 'Discogs token='+this.discogsAuthToken}}).pipe(
+                catchError((error: AxiosError) => {
+                    this.logger.error('An error occurred making request to Discogs API:', error);
+                    throw 'An error happened!';
+                }),
+            ),
+        )
+        const vgPlusCondition = data["Very Good Plus (VG+)"]; // Directly accessing the VG+ condition, we can modify this later to accept a parameter here and filter condition by the input
+        return vgPlusCondition ? vgPlusCondition.value : null;
     }
 
     /**

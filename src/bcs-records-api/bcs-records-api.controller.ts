@@ -4,6 +4,7 @@ import { DiscogsResponse } from 'src/discogs-client/transfer-objects/responses/d
 import { FindRecordsDto } from 'src/bcs-records-api/requests/find-records-request-dto'
 import { ArtistOrTitleRequiredPipe } from 'src/bcs-records-api/validation/find-records-custom-pipe'
 import { BcsRecordsApiService } from './bcs-records-api.service';
+import { PriceSuggestion }  from 'src/discogs-client/transfer-objects/responses/price-suggestion/price-suggestion.interface';
 
 @Controller('bcs')
 export class BcsRecordsApiController {
@@ -14,6 +15,12 @@ export class BcsRecordsApiController {
     @UsePipes(ArtistOrTitleRequiredPipe)
     async findRecords(@Query() findRecordsDto: FindRecordsDto): Promise<DiscogsResponse>{
       return this.bcsRescordsApiService.findRecords(findRecordsDto);
+    }
+
+    @Get('price-suggestion')
+    async getPriceSuggestion(@Query('discogsId') discogsId: string): Promise<number> {
+      console.log(this.bcsRescordsApiService.getPriceSuggestion(discogsId));
+      return this.bcsRescordsApiService.getPriceSuggestion(discogsId);
     }
   
 }
