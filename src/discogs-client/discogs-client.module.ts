@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { DiscogsClientService } from './discogs-client.service';
-import { DiscogsClientController } from './discogs-client.controller';
 import { HttpModule } from '@nestjs/axios';
 
 @Module({
@@ -8,7 +7,7 @@ import { HttpModule } from '@nestjs/axios';
     timeout: 5000,
     maxRedirects: 5,
   })],
-  controllers: [DiscogsClientController],
-  providers: [DiscogsClientService]
+  providers: [DiscogsClientService],
+  exports: [DiscogsClientService]
 })
 export class DiscogsClientModule {}

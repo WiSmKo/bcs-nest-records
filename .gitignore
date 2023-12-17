@@ -36,3 +36,9 @@ lerna-debug.log*
 
 #ENV
 .env
+/.vs/bcs-nest-records/FileContentIndex
+/.vs/bcs-nest-records/v17
+/.vs/ProjectSettings.json
+/.vs/slnx.sqlite
+/.vs/slnx.sqlite-journal
+/.vs/VSWorkspaceState.json
