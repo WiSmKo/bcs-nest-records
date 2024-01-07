@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BcsRecordsApiController } from './bcs-records-api.controller';
 import { DiscogsClientService } from '../discogs-client/discogs-client.service';
-import { DiscogsResponse } from '../discogs-client/transfer-objects/responses/discogs-response/discogs-response.interface'
+import { DiscogsPaginatedSearchResult } from '../discogs-client/transfer-objects/responses/discogs-response/discogs-search-result.interface'
 import { DiscogsClientModule } from '../discogs-client/discogs-client.module';
 import { BcsRecordsApiService } from './bcs-records-api.service';
 import { HttpModule, HttpService } from '@nestjs/axios';
@@ -39,7 +39,7 @@ describe('BcsRecordsApiController', () => {
     })
 });
 
-const expectedResponse: Promise<DiscogsResponse> = Promise.resolve({
+const expectedResponse: Promise<DiscogsPaginatedSearchResult> = Promise.resolve({
     pagination: {
         page: 1,
         pages: 1,

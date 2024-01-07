@@ -2,7 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { AxiosError } from 'axios';
 import { catchError, firstValueFrom } from 'rxjs';
-import { DiscogsResponse } from './transfer-objects/responses/discogs-response/discogs-response.interface';
+import { DiscogsPaginatedSearchResult } from './transfer-objects/responses/discogs-response/discogs-search-result.interface';
 import { Logger } from '@nestjs/common';
 import { FindRecordsDto } from 'src/bcs-records-api/requests/find-records-request-dto'
 import { PriceSuggestion }  from './transfer-objects/responses/price-suggestion/price-suggestion.interface';
@@ -32,7 +32,7 @@ export class DiscogsClientService {
      * @param label name of the label the record was released on
      * @returns 
      */
-    async findRecords(findRecordsDto: FindRecordsDto): Promise<DiscogsResponse>{ 
+    async findRecords(findRecordsDto: FindRecordsDto): Promise<DiscogsPaginatedSearchResult>{ 
 
         const queryParams = {
             type: "release",
@@ -41,7 +41,9 @@ export class DiscogsClientService {
             artist: findRecordsDto.artist,
             year: findRecordsDto.year,
             label: findRecordsDto.label,
-            country: findRecordsDto.country
+            country: findRecordsDto.country,
+            page: findRecordsDto.page,
+            per_page: findRecordsDto.per_page
         }
 
         let url: string = this.buildQuery(queryParams, this.databaseSearchEndpoint);
@@ -50,7 +52,7 @@ export class DiscogsClientService {
 
         //Given that it seems nest.js wraps axios calls in observables for Nest's reactive approach, we use rxjs to convert  response to a promise.
         const { data } = await firstValueFrom(
-            this.httpService.get<DiscogsResponse>(url, 
+            this.httpService.get<DiscogsPaginatedSearchResult>(url, 
                 {headers: 
                     {'Authorization' : 'Discogs token='+this.discogsAuthToken}}).pipe(
                     catchError((error: AxiosError) => {

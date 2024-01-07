@@ -1,4 +1,4 @@
-export class DiscogsResponse {
+export class DiscogsPaginatedSearchResult {
     pagination: {
       page: number;
       pages: number;
