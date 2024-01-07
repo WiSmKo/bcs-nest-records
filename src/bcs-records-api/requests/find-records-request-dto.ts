@@ -22,4 +22,12 @@ export class FindRecordsDto {
     @IsString()
     @IsOptional()
     country: string;
+
+    @IsNumberString()
+    @IsOptional()
+    page: string;
+
+    @IsNumberString()
+    @IsOptional()
+    per_page: string; 
 }
