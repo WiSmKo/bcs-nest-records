@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { DiscogsPaginatedSearchResult } from 'src/discogs-client/transfer-objects/responses/discogs-response/discogs-search-result.interface';
+import { DiscogsPaginatedSearchResult } from '../discogs-client/transfer-objects/responses/discogs-response/discogs-search-result.interface';
 import { FindRecordsDto } from './requests/find-records-request-dto';
-import { DiscogsClientService } from 'src/discogs-client/discogs-client.service';
-import { PriceSuggestion }  from 'src/discogs-client/transfer-objects/responses/price-suggestion/price-suggestion.interface';
+import { DiscogsClientService } from '../discogs-client/discogs-client.service';
 
 @Injectable()
 export class BcsRecordsApiService {
