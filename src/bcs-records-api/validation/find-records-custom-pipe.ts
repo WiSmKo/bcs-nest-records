@@ -2,15 +2,18 @@ import { ArgumentMetadata, BadRequestException, PipeTransform } from '@nestjs/co
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class ArtistOrTitleRequiredPipe implements PipeTransform<any> {
+export class DatabaseSearchValidationPipe implements PipeTransform<any> {
     transform(value: any, metadata: ArgumentMetadata) {
-        const { artist, title } = value;
+        const { artist, title, catno } = value;
 
-        if ((artist === null || artist.trim() === '') && (title === null || title.trim() === '')){
-            throw new BadRequestException('At least one of artist or title properties must not be null');
+        if (            
+            (!artist || (typeof artist === 'string' && artist.trim() === '')) &&
+            (!title || (typeof title === 'string' && title.trim() === '')) &&
+            (!catno || (typeof catno === 'string' && catno.trim() === '')))
+        {
+            throw new BadRequestException('At least one of artist, title or catno properties must not be null');
         }
 
         return value;
     }
-
 }

@@ -9,13 +9,10 @@ export class BcsRecordsApiService {
     constructor(private readonly discogsClientService:DiscogsClientService){};
 
     findRecords(findRecordsDto: FindRecordsDto): Promise<DiscogsPaginatedSearchResult> {
-
         return this.discogsClientService.findRecords(findRecordsDto);
-
     }
 
     getPriceSuggestion(discogsId: String): Promise<number>{
-        return this.discogsClientService.getPriceSuggestions(discogsId.valueOf());
-        
+        return this.discogsClientService.getPriceSuggestions(discogsId.valueOf());   
     }
 }

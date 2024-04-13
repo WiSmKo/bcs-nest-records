@@ -12,14 +12,14 @@ export class DiscogsClientService {
 
     private logger = new Logger('DiscogsClientService');
 
-    private baseUrl: string;
-    private databaseSearchEndpoint: string;
-    private discogsAuthToken: string;
+    private DISCOGS_BASE_PATH: string;
+    private DATABASE_SEARCH_PATH: string;
+    private DISCOGS_AUTH_TOKEN: string;
 
     constructor(private readonly httpService: HttpService) {
-        this.baseUrl = process.env.DISCOGS_BASE_URL;
-        this.databaseSearchEndpoint = '/database/search';
-        this.discogsAuthToken = process.env.DISCOGS_TOKEN;
+        this.DISCOGS_BASE_PATH = process.env.DISCOGS_BASE_URL;
+        this.DATABASE_SEARCH_PATH = '/database/search';
+        this.DISCOGS_AUTH_TOKEN = process.env.DISCOGS_TOKEN;
 
     }
 
@@ -43,18 +43,19 @@ export class DiscogsClientService {
             label: findRecordsDto.label,
             country: findRecordsDto.country,
             page: findRecordsDto.page,
-            per_page: findRecordsDto.per_page
+            per_page: findRecordsDto.per_page,
+            catno: findRecordsDto.catno
         }
 
-        let url: string = this.buildQuery(queryParams, this.databaseSearchEndpoint);
+        let url: string = this.buildQuery(queryParams, this.DATABASE_SEARCH_PATH);
 
         this.logger.log(`Searching url: ${url}`);
 
-        //Given that it seems nest.js wraps axios calls in observables for Nest's reactive approach, we use rxjs to convert  response to a promise.
+        //Given that it seems nest.js wraps axios calls in observables for Nest's reactive approach, we use rxjs to convert response to a promise.
         const { data } = await firstValueFrom(
             this.httpService.get<DiscogsPaginatedSearchResult>(url, 
                 {headers: 
-                    {'Authorization' : 'Discogs token='+this.discogsAuthToken}}).pipe(
+                    {'Authorization' : 'Discogs token='+this.DISCOGS_AUTH_TOKEN}}).pipe(
                     catchError((error: AxiosError) => {
                     this.logger.error('An error occurred making request to Discogs API:', error);
                     throw error;
@@ -69,10 +70,10 @@ export class DiscogsClientService {
         console.log(`Discogs Client Service: Getting price suggestions for discogs id [${discogsId}]`)
         const { data } = await firstValueFrom(
             this.httpService.get<PriceSuggestion>('https://api.discogs.com/marketplace/price_suggestions/'+discogsId, 
-            {headers: {'Authorization' : 'Discogs token='+this.discogsAuthToken}}).pipe(
+            {headers: {'Authorization' : 'Discogs token='+this.DISCOGS_AUTH_TOKEN}}).pipe(
                 catchError((error: AxiosError) => {
                     this.logger.error('An error occurred making request to Discogs API:', error);
-                    throw 'An error happened!';
+                    throw 'Discogs client request failed.';
                 }),
             ),
         )
@@ -98,7 +99,7 @@ export class DiscogsClientService {
             }
         }
 
-        return `${this.baseUrl}${endpoint}?${urlSearchParams.toString()}`;
+        return `${this.DISCOGS_BASE_PATH}${endpoint}?${urlSearchParams.toString()}`;
 
     }
 
