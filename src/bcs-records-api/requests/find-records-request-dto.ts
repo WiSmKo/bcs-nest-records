@@ -30,4 +30,8 @@ export class FindRecordsDto {
     @IsNumberString()
     @IsOptional()
     per_page: string; 
+
+    @IsString()
+    @IsOptional()
+    catno:string;
 }
