@@ -3,6 +3,7 @@ import { DiscogsPaginatedSearchResult } from '../discogs-client/transfer-objects
 import { FindRecordsDto } from './requests/find-records-request-dto'
 import { DatabaseSearchValidationPipe } from './validation/find-records-custom-pipe'
 import { BcsRecordsApiService } from './bcs-records-api.service';
+import { ReleaseGroupSearchResponse } from 'src/musicbrainz/data-interfaces/release-group-search-response.interface';
 
 @Controller('bcs')
 export class BcsRecordsApiController {
@@ -18,6 +19,11 @@ export class BcsRecordsApiController {
     @Get('price-suggestion')
     async getPriceSuggestion(@Query('discogsId') discogsId: string): Promise<number> {
       return this.bcsRescordsApiService.getPriceSuggestion(discogsId);
+    }
+
+    @Get('find-record')
+    async findRecord(@Query() findRecordsDto: FindRecordsDto): Promise<ReleaseGroupSearchResponse>{
+      return this.bcsRescordsApiService.findRecord(findRecordsDto);
     }
   
 }
