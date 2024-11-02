@@ -1,0 +1,3 @@
+interface ArtistCredit {
+    artist: Artist;
+}

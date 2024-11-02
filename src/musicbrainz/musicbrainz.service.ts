@@ -3,6 +3,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { AxiosError } from 'axios';
 import { catchError, lastValueFrom } from 'rxjs';
 import { FindRecordsDto } from 'src/bcs-records-api/requests/find-records-request-dto';
+import { ReleaseGroupSearchResponse } from './data-interfaces/release-group-search-response.interface';
 
 @Injectable()
 export class MusicbrainzService {
@@ -17,7 +18,7 @@ export class MusicbrainzService {
         this.RELEASE_GROUP = "release-group";
     }
 
-    async findReleaseGroup(findRecordsDto: FindRecordsDto): Promise<any> {
+    async findReleaseGroup(findRecordsDto: FindRecordsDto): Promise<ReleaseGroupSearchResponse> {
         const queryParams = {
             releasegroup: findRecordsDto.title,
             artist: findRecordsDto.artist
@@ -25,12 +26,14 @@ export class MusicbrainzService {
         const url = this.buildQuery(queryParams, this.RELEASE_GROUP);
         this.logger.log(`Searching url: ${url}`);
 
-        const { data } = await lastValueFrom(this.httpService.get(url).pipe(
+        const { data } = await lastValueFrom(this.httpService.get<ReleaseGroupSearchResponse>(url).pipe(
             catchError((error: AxiosError) => {
                 this.logger.error('An error occurred making request to Musicbrainz API:', error);
                 throw error;
             })
         ));
+
+        return data;
     }
 
     private buildQuery(parameters: Record<string, any>, endpoint: string): string{
