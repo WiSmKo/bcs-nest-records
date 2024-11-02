@@ -67,7 +67,7 @@ export class DiscogsClientService {
     }
 
     async getPriceSuggestions(discogsId: String): Promise<number>{
-        console.log(`Discogs Client Service: Getting price suggestions for discogs id [${discogsId}]`)
+        this.logger.log(`Discogs Client Service: Getting price suggestions for discogs id [${discogsId}]`)
         const { data } = await firstValueFrom(
             this.httpService.get<PriceSuggestion>('https://api.discogs.com/marketplace/price_suggestions/'+discogsId, 
             {headers: {'Authorization' : 'Discogs token='+this.DISCOGS_AUTH_TOKEN}}).pipe(

@@ -4,6 +4,7 @@ import { FindRecordsDto } from './requests/find-records-request-dto'
 import { DatabaseSearchValidationPipe } from './validation/find-records-custom-pipe'
 import { BcsRecordsApiService } from './bcs-records-api.service';
 import { ReleaseGroupSearchResponse } from 'src/musicbrainz/data-interfaces/release-group-search-response.interface';
+import { FindRecordResponse } from './responses/find-record-response';
 
 @Controller('bcs')
 export class BcsRecordsApiController {
@@ -22,7 +23,7 @@ export class BcsRecordsApiController {
     }
 
     @Get('find-record')
-    async findRecord(@Query() findRecordsDto: FindRecordsDto): Promise<ReleaseGroupSearchResponse>{
+    async findRecord(@Query() findRecordsDto: FindRecordsDto): Promise<FindRecordResponse>{
       return this.bcsRescordsApiService.findRecord(findRecordsDto);
     }
   
