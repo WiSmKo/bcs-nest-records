@@ -2,10 +2,10 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { AxiosError } from 'axios';
 import { catchError, firstValueFrom } from 'rxjs';
-import { DiscogsPaginatedSearchResult } from './transfer-objects/responses/discogs-response/discogs-search-result.interface';
+import { DiscogsPaginatedSearchResult } from './data-interfaces/discogs-search-result.interface';
 import { Logger } from '@nestjs/common';
 import { FindRecordsDto } from 'src/bcs-records-api/requests/find-records-request-dto'
-import { PriceSuggestion }  from './transfer-objects/responses/price-suggestion/price-suggestion.interface';
+import { PriceSuggestion }  from './data-interfaces/price-suggestion.interface';
 
 @Injectable()
 export class DiscogsClientService {
@@ -66,10 +66,27 @@ export class DiscogsClientService {
         return data;
     }
 
-    async getPriceSuggestions(discogsId: String): Promise<number>{
-        this.logger.log(`Discogs Client Service: Getting price suggestions for discogs id [${discogsId}]`)
+    async getMasterRelease(masterId: number): Promise<any>{
+
+        this.logger.log(`Discogs Client Service: Getting master release for discogs master id [${masterId}]`)
+        
         const { data } = await firstValueFrom(
-            this.httpService.get<PriceSuggestion>('https://api.discogs.com/marketplace/price_suggestions/'+discogsId, 
+            this.httpService.get<any>('https://api.discogs.com/masters/'+masterId, 
+            {headers: {'Authorization' : 'Discogs token='+this.DISCOGS_AUTH_TOKEN}}).pipe(
+                catchError((error: AxiosError) => {
+                    this.logger.error('An error occurred making request to Discogs API:', error);
+                    throw 'Discogs client request failed.';
+                }),
+            ),
+        )
+
+        return data;
+    }
+
+    async getPriceSuggestions(discogsId: number): Promise<number>{
+        this.logger.log(`Discogs Client Service: Getting price suggestions for discogs id [${discogsId.toString()}]`);
+        const { data } = await firstValueFrom(
+            this.httpService.get<PriceSuggestion>('https://api.discogs.com/marketplace/price_suggestions/'+discogsId.toString(), 
             {headers: {'Authorization' : 'Discogs token='+this.DISCOGS_AUTH_TOKEN}}).pipe(
                 catchError((error: AxiosError) => {
                     this.logger.error('An error occurred making request to Discogs API:', error);

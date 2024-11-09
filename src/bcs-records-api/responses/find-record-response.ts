@@ -1,10 +1,12 @@
 export class FindRecordResponse {
     
     title: string;
-    artist: string;
-    year: string; 
-    type: string;
-    noOfReleases: number;
-    priceSuggestion: number;
+    artists: string[];
+    year: number; 
+    noOfTracks: number;
+    noForSale: number;
+    originalPriceSuggestion: number;
+    latestPriceSuggestion: number;
+    genres: string[];
 
 }
