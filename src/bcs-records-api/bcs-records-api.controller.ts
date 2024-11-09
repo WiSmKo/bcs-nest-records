@@ -1,5 +1,5 @@
-import { Controller, Get, Query, UsePipes } from '@nestjs/common';
-import { DiscogsPaginatedSearchResult } from '../discogs-client/transfer-objects/responses/discogs-response/discogs-search-result.interface';
+import { Controller, Get, ParseIntPipe, Query, UsePipes } from '@nestjs/common';
+import { DiscogsPaginatedSearchResult } from '../discogs-client/data-interfaces/discogs-search-result.interface';
 import { FindRecordsDto } from './requests/find-records-request-dto'
 import { DatabaseSearchValidationPipe } from './validation/find-records-custom-pipe'
 import { BcsRecordsApiService } from './bcs-records-api.service';
@@ -18,7 +18,7 @@ export class BcsRecordsApiController {
     }
 
     @Get('price-suggestion')
-    async getPriceSuggestion(@Query('discogsId') discogsId: string): Promise<number> {
+    async getPriceSuggestion(@Query('discogsId', ParseIntPipe) discogsId: number): Promise<number> {
       return this.bcsRescordsApiService.getPriceSuggestion(discogsId);
     }
 

@@ -1,14 +1,17 @@
-import { Injectable } from '@nestjs/common';
-import { DiscogsPaginatedSearchResult } from '../discogs-client/transfer-objects/responses/discogs-response/discogs-search-result.interface';
+import { Injectable, Logger } from '@nestjs/common';
+import { DiscogsPaginatedSearchResult } from '../discogs-client/data-interfaces/discogs-search-result.interface';
 import { FindRecordsDto } from './requests/find-records-request-dto';
 import { DiscogsClientService } from '../discogs-client/discogs-client.service';
 import { ReleaseGroupSearchResponse } from 'src/musicbrainz/data-interfaces/release-group-search-response.interface';
 import { MusicbrainzService } from 'src/musicbrainz/musicbrainz.service';
 import { FindRecordResponse } from './responses/find-record-response';
 import { FindUrlsResponse } from 'src/musicbrainz/data-interfaces/find-urls-response';
+import { DiscogsMaster } from 'src/discogs-client/data-interfaces/discogs-master-response.interface';
 
 @Injectable()
 export class BcsRecordsApiService {
+
+    private logger = new Logger('BcsRecordsApiService');
 
     constructor(private readonly discogsClientService:DiscogsClientService, private readonly musicbrainzService:MusicbrainzService){};
 
@@ -16,28 +19,27 @@ export class BcsRecordsApiService {
         return this.discogsClientService.findRecords(findRecordsDto);
     }
 
-    getPriceSuggestion(discogsId: String): Promise<number>{
-        return this.discogsClientService.getPriceSuggestions(discogsId.valueOf());   
+    getPriceSuggestion(discogsId: number): Promise<number>{
+        return this.discogsClientService.getPriceSuggestions(discogsId);   
     }
 
     async findRecord(findRecordsDto: FindRecordsDto): Promise<FindRecordResponse> {        
         
-        let priceSuggestion: number;
-        const release: ReleaseGroupSearchResponse = await this.musicbrainzService.findReleaseGroup(findRecordsDto);
-        const relations: FindUrlsResponse = await this.musicbrainzService.findUrls(release['release-groups'][0].releases[0].id);
-        const discogsId = this.getDiscogsResourceId(relations);
+        const discogsSearchResult: DiscogsPaginatedSearchResult = await this.discogsClientService.findRecords(findRecordsDto);
+        const discogsMaster: DiscogsMaster = await this.discogsClientService.getMasterRelease(discogsSearchResult.results[0].master_id);
 
-        if(discogsId){
-            priceSuggestion = await this.discogsClientService.getPriceSuggestions(discogsId);
-        }
+        const mainReleasePriceSuggestion = await this.discogsClientService.getPriceSuggestions(discogsMaster.main_release);
+        const latestReleasePriceSuggestion = await this.discogsClientService.getPriceSuggestions(discogsMaster.most_recent_release);  
 
         const findRecordResponse: FindRecordResponse = {
-            title: release['release-groups'][0].title,
-            artist: release['release-groups'][0]['artist-credit'][0].artist.name,
-            year: release['release-groups'][0]['first-release-date'],
-            type: release['release-groups'][0]['primary-type'],
-            noOfReleases: release['release-groups'][0].count,
-            priceSuggestion: priceSuggestion
+            title: discogsMaster.title,
+            artists: discogsMaster.artists.map(artist => artist.name),
+            year: discogsMaster.year,
+            noOfTracks: discogsMaster.tracklist.length,
+            noForSale: discogsMaster.num_for_sale,
+            originalPriceSuggestion: mainReleasePriceSuggestion,
+            latestPriceSuggestion: latestReleasePriceSuggestion,
+            genres: discogsMaster.genres.concat(discogsMaster.styles)
         }
 
         return findRecordResponse;
